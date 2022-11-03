@@ -2,7 +2,7 @@ import logging
 import pandas as pd
 import telegram
 import numpy as np
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
 import requests
 
@@ -19,7 +19,7 @@ except IndexError:
 ####################################################################################################################
 
 
-def itr ():
+def itr():
     return iter(["Costo KW/h ( 1 cent = 0.01 )", "Cantidad de TH",
                  "Consumo en Kwatts  (1,000 Watss = 1 Kwatss)"])
 
@@ -29,6 +29,7 @@ def blockchain_stats():
     url_pool = "https://api.blockchain.info/stats"
     r = requests.get(url_pool)
     return r.json()
+
 
 class data:
     iterList = itr()
@@ -44,13 +45,16 @@ def calcProfit(kW, Th, consuptionW):
     result = profit - lightCost
     return result
 
+
 def ThConstProfit():
     # For now is only Statit Calc but should be more efficient
     binance_calc = 0.00012648 / 37.14
     return binance_calc
+
+
 def soporte(update, context):
-    
-    update.message.reply_text('''Hola!, Soy un Bot Beta que calcula el Profit Diario y Mensual basado en el consumo KW/h y El poder de Computo en (TH). Por ahora me crearon con ese fin quizas con el tiempo de uso podre desarrollar mas herramientas y mas facil para ti. Esto es un desarrollo de DoctorMIner & Leviatan CryptoLab.
+
+    update.message.reply_text('''Hola!, Soy un Bot Beta que calcula el Profit Diario y Mensual basado en el consumo KW/h y El poder de Computo en (TH). Por ahora me crearon con ese fin quizas con el tiempo de uso podre desarrollar mas herramientas y mas facil para ti. Esto es un desarrollo de Doctorminer & Leviatan CryptoLab.
     Los Creadores de este Proyecto: Juan Vicente Ventrone y Theo Toukoumidis.\n Nota!: Es un desarrollo Beta puede tener Fallas.
     https://t.me/JVentrone''')
 
@@ -64,68 +68,69 @@ def resultCalc(update, context):
         Th = float(data.const[1])
         consuptionW = float(data.const[2])
         data.const = []
-        value = round(calcProfit(costKw, Th, consuptionW), 4 )
+        value = round(calcProfit(costKw, Th, consuptionW), 4)
         valueMonth = value*30
-        update.message.reply_text('Profit Diario: $'+ str(value) +'\n'
-                               'Profit Mensual: $'+ str(valueMonth)
-                                ,reply_markup=reply_markup
-                               )
+        update.message.reply_text('Profit Diario: $' + str(value) + '\n'
+                                  'Profit Mensual: $' + str(valueMonth), reply_markup=reply_markup
+                                  )
     except:
         update.message.reply_text(
-            'Ups😵, Debes ingresar un valor valido, es decir solo numeros!'
-            , reply_markup=reply_markup)
+            'Ups😵, Debes ingresar un valor valido, es decir solo numeros!', reply_markup=reply_markup)
+
 
 def start(update, context: CallbackContext):
-        keyboard = [[InlineKeyboardButton(
-            " ⚡ EMPEZAR ⚡ ", callback_data='getVariables'), ]]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        update.message.reply_text(
-                                  'Hola! '+ str(update.message.chat.username) +
-                                  ', Para Calcular el Profit Diario y Mensual necesito saber coste en costKw/h, el Hashrate (Poder de Computo) en TH y el consumo electrico en Kwatts.\n' +
-                                  'Mayor Informacion de este Bot /info\n'+
-                                  '¿Quienes somos? /soporte'
-                                  ,reply_markup=reply_markup
-                                )
-        
+    keyboard = [[InlineKeyboardButton(
+        " ⚡ EMPEZAR ⚡ ", callback_data='getVariables'), ]]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    update.message.reply_text(
+        'Hola! ' + str(update.message.chat.username) +
+        ', Para Calcular el Profit Diario y Mensual necesito saber coste en costKw/h, el Hashrate (Poder de Computo) en TH y el consumo electrico en Kwatts.\n' +
+        'Mayor Informacion de este Bot /info\n' +
+        '¿Quienes somos? /soporte', reply_markup=reply_markup
+    )
+
 
 def getVariables(update, context: CallbackContext):
     data.const = []
+    data.stat = blockchain_stats()
     data.x = next(data.iterList)
     update.callback_query.message.reply_text(data.x)
-    
+
+
 def info(update, context):
     keyboard = [[InlineKeyboardButton(
         " ⚡EMPEZAR ⚡ ", callback_data='getVariables'), ]]
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text(
         'Resultado Diario: La recompensa Generada Diaria por su de poder de computo "Menos" El gasto del consumo electrico diario \n\n' +
-        'Resultado Mensual: La recompensa Generada Mensual (30 Dias) por su poder de computo "Menos" El gasto del consumo electrico Mensual (30 Dias) \n'
-        , reply_markup=reply_markup
+        'Resultado Mensual: La recompensa Generada Mensual (30 Dias) por su poder de computo "Menos" El gasto del consumo electrico Mensual (30 Dias) \n', reply_markup=reply_markup
     )
 
 
 def echo(update, context):
     data.const.append(update.message.text)
-    
+
     if data.x == 'Consumo en Kwatts  (1,000 Watss = 1 Kwatss)':
         data.iterList = itr()
         resultCalc(update, context)
         return True
     data.x = next(data.iterList)
     update.message.reply_text(data.x)
-    
-def sticker(bot,update):
+
+
+def sticker(bot, update):
     reply = update.message.sticker.file_id
-    bot.send_sticker(chat_id = update.message.chat_id, sticker = reply)
-    
+    bot.send_sticker(chat_id=update.message.chat_id, sticker=reply)
+
 
 def main():
 
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater('5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8', use_context=True)
+    updater = Updater(
+        '5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8', use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -136,10 +141,10 @@ def main():
     dp.add_handler(CommandHandler("calc", resultCalc))
     dp.add_handler(CommandHandler("soporte", soporte))
     dp.add_handler(CommandHandler("info", info))
-    
-    
-    dp.add_handler(CallbackQueryHandler(getVariables, pattern='^getVariables$'))
-    
+
+    dp.add_handler(CallbackQueryHandler(
+        getVariables, pattern='^getVariables$'))
+
     dp.add_handler(MessageHandler(Filters.sticker, sticker))
     dp.add_handler(MessageHandler(Filters.text, echo))
     # Start the Bot
@@ -149,7 +154,6 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-    
 
 
 if __name__ == '__main__':
