@@ -11,7 +11,8 @@ import requests
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-bot = telegram.Bot(token='1203014270:AAEcmANbEwlLCtDqCW_xogdgUMU92xh9cxc')
+bot = telegram.Bot(
+    token='5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8')
 try:
     chat_id = bot.get_updates()[-1].message.chat_id
 except IndexError:
@@ -131,7 +132,7 @@ def main():
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater(
-        '1203014270:AAEcmANbEwlLCtDqCW_xogdgUMU92xh9cxc', use_context=True)
+        '5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8', use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
