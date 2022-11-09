@@ -11,7 +11,7 @@ import requests
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
-bot = telegram.Bot(token='5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8')
+bot = telegram.Bot(token='1203014270:AAEcmANbEwlLCtDqCW_xogdgUMU92xh9cxc')
 try:
     chat_id = bot.get_updates()[-1].message.chat_id
 except IndexError:
@@ -93,6 +93,7 @@ def start(update, context: CallbackContext):
 
 def getVariables(update, context: CallbackContext):
     data.const = []
+    data.iterList = itr()
     data.stat = blockchain_stats()
     data.x = next(data.iterList)
     update.callback_query.message.reply_text(data.x)
@@ -130,7 +131,7 @@ def main():
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
     updater = Updater(
-        '5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8', use_context=True)
+        '1203014270:AAEcmANbEwlLCtDqCW_xogdgUMU92xh9cxc', use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -141,7 +142,6 @@ def main():
     dp.add_handler(CommandHandler("calc", resultCalc))
     dp.add_handler(CommandHandler("soporte", soporte))
     dp.add_handler(CommandHandler("info", info))
-
     dp.add_handler(CallbackQueryHandler(
         getVariables, pattern='^getVariables$'))
 
