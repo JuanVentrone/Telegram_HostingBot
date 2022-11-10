@@ -1,18 +1,20 @@
+import configparser
 import logging
-import pandas as pd
-import telegram
 import numpy as np
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext
 import requests
-
+import telegram
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import (CallbackContext, CallbackQueryHandler,
+                          CommandHandler, Filters, MessageHandler, Updater)
 
 # Enable logging
+config = configparser.ConfigParser()
+config.read('conf.ini')
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 logger = logging.getLogger(__name__)
 bot = telegram.Bot(
-    token='5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8')
+    token=config['KEY']['token'])
 try:
     chat_id = bot.get_updates()[-1].message.chat_id
 except IndexError:
@@ -49,7 +51,7 @@ def calcProfit(kW, Th, consuptionW):
 
 def ThConstProfit():
     # For now is only Statit Calc but should be more efficient
-    binance_calc = 0.00012648 / 37.14
+    binance_calc = 0.0000035
     return binance_calc
 
 
@@ -131,8 +133,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(
-        '5567475614:AAHCNydq4QLcJlHfCPvWVwUfEHviguIKJi8', use_context=True)
+    updater = Updater(config['KEY']['token'], use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -140,7 +141,6 @@ def main():
     # on different commands - answer in Telegram
     # p.add_handler(CommandHandler("menu", menu))
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("calc", resultCalc))
     dp.add_handler(CommandHandler("soporte", soporte))
     dp.add_handler(CommandHandler("info", info))
     dp.add_handler(CallbackQueryHandler(
